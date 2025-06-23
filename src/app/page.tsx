@@ -1,101 +1,97 @@
-import Image from "next/image";
+"use client";
+import { useRef, useState } from "react";
 
-export default function Home() {
+export default function Cubo3D() {
+  const cuboRef = useRef(null);
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const lastPosition = useRef({ x: 0, y: 0 });
+
+  const startDrag = (e) => {
+    setDragging(true);
+    lastPosition.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const onDrag = (e) => {
+    if (!dragging) return;
+    const deltaX = e.clientX - lastPosition.current.x;
+    const deltaY = e.clientY - lastPosition.current.y;
+    setRotation((prev) => ({
+      x: prev.x - deltaY * 0.5,
+      y: prev.y + deltaX * 0.5,
+    }));
+    lastPosition.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const stopDrag = () => setDragging(false);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div
+      className="flex justify-center items-center h-screen bg-black"
+      onMouseMove={onDrag}
+      onMouseUp={stopDrag}
+    >
+      {/* Contenedor con perspectiva 3D */}
+      <div className="relative w-40 h-40 perspective-[800px]">
+        <div
+          ref={cuboRef}
+          className="absolute w-40 h-40 transform-style-preserve-3d cursor-grab"
+          style={{
+            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+            transformStyle: "preserve-3d", // Asegura que el cubo se mantenga en 3D
+          }}
+          onMouseDown={startDrag}
+          onMouseUp={stopDrag}
+        >
+          {/* Cara frontal */}
+          <div
+            className="absolute w-40 h-40 bg-black border-2 border-white shadow-[0_0_20px_rgba(138,43,226,0.8)]"
+            style={{
+              transform: "translateZ(20px)", // Frente
+            }}
+          ></div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {/* Cara trasera */}
+          <div
+            className="absolute w-40 h-40 bg-black border-2 border-white shadow-[0_0_20px_rgba(138,43,226,0.8)]"
+            style={{
+              transform: "rotateY(180deg) translateZ(20px)", // Trasera
+            }}
+          ></div>
+
+          {/* Cara izquierda */}
+          <div
+            className="absolute w-40 h-40 bg-black border-2 border-white shadow-[0_0_20px_rgba(138,43,226,0.8)]"
+            style={{
+              transform: "rotateY(-90deg) translateZ(20px)", // Izquierda
+            }}
+          ></div>
+
+          {/* Cara derecha */}
+          <div
+            className="absolute w-40 h-40 bg-black border-2 border-white shadow-[0_0_20px_rgba(138,43,226,0.8)]"
+            style={{
+              transform: "rotateY(90deg) translateZ(20px)", // Derecha
+            }}
+          ></div>
+
+          {/* Cara superior */}
+          <div
+            className="absolute w-40 h-40 bg-black border-2 border-white shadow-[0_0_20px_rgba(138,43,226,0.8)]"
+            style={{
+              transform: "rotateX(-90deg) translateZ(20px)", // Arriba
+            }}
+          ></div>
+
+          {/* Cara inferior */}
+          <div
+            className="absolute w-40 h-40 bg-black border-2 border-white shadow-[0_0_20px_rgba(138,43,226,0.8)]"
+            style={{
+              transform: "rotateX(90deg) translateZ(20px)", // Abajo
+            }}
+          ></div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
